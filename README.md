@@ -33,3 +33,20 @@ Ems-FullStack/
   - `firstName`
   - `lastName`
   - `email` (Unique & Not Null)
+
+## Getting Started (Backend)
+
+1. Navigate to the backend directory:
+   ```bash
+   cd ems-backend
+   ```
+2. Copy the example configuration to create your local `application.properties`:
+   ```bash
+   cp src/main/resources/application.properties.example src/main/resources/application.properties
+   ```
+3. Update `src/main/resources/application.properties` with your MySQL database username and password.
+4. Run the backend application:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+
