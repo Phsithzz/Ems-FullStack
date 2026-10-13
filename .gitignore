@@ -1,0 +1,34 @@
+# IntelliJ IDEA / Editors
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Java & Maven
+**/target/
+**/.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Sensitive & Configuration Files (Secrets, Credentials, Passwords)
+**/src/main/resources/application.properties
+**/src/main/resources/application-*.properties
+**/src/main/resources/application.yml
+**/src/main/resources/application-*.yml
+*.env
+*.env.*
+.env
+.env.*
+*.key
+*.pem
+*.p12
+
+# Node & Frontend (for future frontend)
+**/node_modules/
+**/dist/
+**/build/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
