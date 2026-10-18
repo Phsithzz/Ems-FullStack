@@ -1,15 +1,11 @@
 package net.javaguides.ems.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "employees")
 public class Employee {
@@ -23,5 +19,15 @@ public class Employee {
     private String lastName;
     @Column(name = "email_id",nullable = false,unique = true)
     private String email;
+
+    public Employee() {
+    }
+
+    public Employee(Long id, String firstName, String lastName, String email) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
 }
 
