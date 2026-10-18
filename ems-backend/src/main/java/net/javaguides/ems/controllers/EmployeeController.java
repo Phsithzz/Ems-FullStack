@@ -50,4 +50,14 @@ public class EmployeeController {
 
         return ResponseEntity.ok(employeeDto);
     }
+
+    //build delete employee
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> deleteEmployee(
+            @PathVariable("id") Long employeeId
+    ){
+        employeeService.deleteEmployee(employeeId);
+
+        return ResponseEntity.ok("Employee deleted successfully!!!");
+    }
 }
