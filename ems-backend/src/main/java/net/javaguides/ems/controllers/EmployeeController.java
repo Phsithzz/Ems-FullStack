@@ -5,10 +5,7 @@ import net.javaguides.ems.dto.EmployeeDto;
 import net.javaguides.ems.services.EmployeeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
@@ -24,5 +21,13 @@ public class EmployeeController {
         EmployeeDto saveEmployee = employeeService.createEmployee(employeeDto);
 
         return new ResponseEntity<>(saveEmployee, HttpStatus.CREATED);
+    }
+
+    //build get one employee rest api
+    @GetMapping("{id}")
+    public ResponseEntity<EmployeeDto> getEmploeeById(@PathVariable("id") Long employeeId){
+        EmployeeDto employeeDto = employeeService.getEmployeeId(employeeId);
+
+        return ResponseEntity.ok(employeeDto);
     }
 }
