@@ -1,16 +1,29 @@
-import './App.css'
-import FooterComponent from './components/FooterComponent'
-import HeaderComponent from './components/HeaderComponent'
-import ListEmployeeComponent from './components/ListEmployeeComponent'
+import "./App.css";
+import FooterComponent from "./components/FooterComponent";
+import HeaderComponent from "./components/HeaderComponent";
+import ListEmployeeComponent from "./components/ListEmployeeComponent";
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 const App = () => {
   return (
     <>
-      <HeaderComponent />
-      <ListEmployeeComponent />
-      <FooterComponent />
-    </>
-  )
-}
+      <BrowserRouter>
+        <HeaderComponent />
+        <Routes>
 
-export default App
+          {/* localhost:3000 */}
+          <Route path="/" element={<ListEmployeeComponent />} />
+
+          {/* localhost:3000/employees */}
+          <Route path="/employees" element={<ListEmployeeComponent />} />
+
+
+        </Routes>
+        <FooterComponent />
+      </BrowserRouter>
+    </>
+  );
+};
+
+export default App;
