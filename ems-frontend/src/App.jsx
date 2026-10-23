@@ -1,4 +1,5 @@
 import "./App.css";
+import EmployeeComponent from "./components/EmployeeComponent";
 import FooterComponent from "./components/FooterComponent";
 import HeaderComponent from "./components/HeaderComponent";
 import ListEmployeeComponent from "./components/ListEmployeeComponent";
@@ -18,6 +19,7 @@ const App = () => {
           {/* localhost:3000/employees */}
           <Route path="/employees" element={<ListEmployeeComponent />} />
 
+          <Route path="/add-employee" element={<EmployeeComponent/>}/>
 
         </Routes>
         <FooterComponent />
