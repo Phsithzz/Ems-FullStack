@@ -4,17 +4,20 @@ import { useNavigate } from "react-router-dom";
 
 const ListEmployeeComponent = () => {
   const [employees, setEmployees] = useState([]);
-
   const navigator = useNavigate();
+
   useEffect(() => {
-    listEmployees()
-      .then((response) => {
-        setEmployees(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    getAllEmployees();
   }, []);
+
+  const getAllEmployees = async () => {
+    try {
+      const response = await listEmployees();
+      setEmployees(response.data);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    }
+  };
 
   function addNewEmPloyee() {
     navigator("/add-employee");
@@ -26,7 +29,7 @@ const ListEmployeeComponent = () => {
       <button className="btn btn-primary mb-2" onClick={addNewEmPloyee}>
         Add Employee
       </button>
-      <table className="table table-striped table-border">
+      <table className="table table-striped table-bordered">
         <thead>
           <tr>
             <th>Employee Id</th>
@@ -44,7 +47,6 @@ const ListEmployeeComponent = () => {
               <td>{employee.email}</td>
             </tr>
           ))}
-          <tr></tr>
         </tbody>
       </table>
     </div>
