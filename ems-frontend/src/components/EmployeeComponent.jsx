@@ -9,20 +9,61 @@ const EmployeeComponent = () => {
 
   const navigator = useNavigate();
 
+  const [error,setError] = useState({
+    firstName:'',
+    lastName:'',
+    email:'',
+  })
+
   const saveEmployee = async (e) => {
     e.preventDefault();
 
-    const employee = { firstName, lastName, email };
-    console.log(employee);
+    if(validateForm){
 
-    try {
-      const response = await createEmployee(employee);
-      console.log(response.data);
-      navigator("/employees");
-    } catch (error) {
-      console.error("Error creating employee:", error);
+      const employee = { firstName, lastName, email };
+      console.log(employee);
+  
+      try {
+        const response = await createEmployee(employee);
+        console.log(response.data);
+        navigator("/employees");
+      } catch (error) {
+        console.error("Error creating employee:", error);
+      }
     }
   };
+
+  function validateForm(){
+    let valid = true
+
+    const errorCopy = {... error}
+
+    if(firstName.trim()){
+      errorCopy.firstName = ''
+    }
+    else{
+      errorCopy.firstName = 'Firstname is required'
+      valid = false
+    }
+
+    if(lastName.trim()){
+      errorCopy.lastName = ''
+    }
+    else{
+      errorCopy.lastName = 'Lastname is required'
+      valid = false
+    }
+
+    if(email.trim()){
+      errorCopy.email = ''
+    }
+    else{
+      errorCopy.email = 'Email is required'
+      valid = false
+
+    }
+  }
+
 
   return (
     <div className="container">
@@ -41,8 +82,9 @@ const EmployeeComponent = () => {
                   name="firstName"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="form-control"
+                  className={}
                 />
+                
               </div>
 
               <div className="form-group mb-2">
