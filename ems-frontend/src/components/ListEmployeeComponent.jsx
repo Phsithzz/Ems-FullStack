@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { listEmployees } from "../services/EmployeeService";
+import { deleteEmployee, listEmployees } from "../services/EmployeeService";
 import { useNavigate } from "react-router-dom";
 
 const ListEmployeeComponent = () => {
@@ -25,6 +25,15 @@ const ListEmployeeComponent = () => {
 
   const updateEmployee = (id) => {
     navigator(`/edit-employee/${id}`);
+  };
+
+  const removeEmployee = async (id) => {
+    try {
+      await deleteEmployee(id);
+      getAllEmployees();
+    } catch (err) {
+      console.error("Error deleting employee:", err);
+    }
   };
 
   return (
@@ -56,6 +65,13 @@ const ListEmployeeComponent = () => {
                   onClick={() => updateEmployee(employee.id)}
                 >
                   Update
+                </button>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => removeEmployee(employee.id)}
+                  style={{ marginLeft: "10px" }}
+                >
+                  Delete
                 </button>
               </td>
             </tr>
