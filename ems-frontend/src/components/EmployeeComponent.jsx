@@ -18,7 +18,7 @@ const EmployeeComponent = () => {
   const saveEmployee = async (e) => {
     e.preventDefault();
 
-    if(validateForm){
+    if(validateForm()){
 
       const employee = { firstName, lastName, email };
       console.log(employee);
@@ -62,6 +62,10 @@ const EmployeeComponent = () => {
       valid = false
 
     }
+
+    setError(errorCopy);
+
+    return valid;
   }
 
 
@@ -82,9 +86,11 @@ const EmployeeComponent = () => {
                   name="firstName"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className={}
+                  className={`form-control ${error.firstName ? 'is-invalid' : '' }`}
                 />
-                
+                {error.firstName &&(
+                  <div className="invalid-feedback">{error.firstName}</div>
+                )}
               </div>
 
               <div className="form-group mb-2">
@@ -95,8 +101,13 @@ const EmployeeComponent = () => {
                   name="lastName"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="form-control"
+                  className={`form-control ${error.lastName ? 'is-invalid' : ''}`}
                 />
+                {error.lastName &&(
+                  <div className="invalid-feedback">
+                    {error.lastName}
+                  </div>
+                )}
               </div>
 
               <div className="form-group mb-2">
@@ -107,8 +118,11 @@ const EmployeeComponent = () => {
                   name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="form-control"
+                  className={`form-control ${error.email ? 'is-invalid' : ''}`}
                 />
+                {error.email &&(
+                  <div className="invalid-feedback">{error.email}</div>
+                )}
               </div>
 
               <button className="btn btn-success" onClick={saveEmployee}>
