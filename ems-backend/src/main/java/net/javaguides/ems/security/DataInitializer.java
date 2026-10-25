@@ -45,8 +45,8 @@ public class DataInitializer implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         // 1. Seed Admin User
-        User admin;
-        if (userRepository.count() == 0) {
+        User admin = userRepository.findByEmail("admin@workpay.io").orElse(null);
+        if (admin == null) {
             admin = new User();
             admin.setName("WorkPay System Admin");
             admin.setEmail("admin@workpay.io");
@@ -56,7 +56,11 @@ public class DataInitializer implements CommandLineRunner {
             admin = userRepository.save(admin);
             log.info("🎉 [SEED] Admin created: admin@workpay.io / admin123");
         } else {
-            admin = userRepository.findAll().get(0);
+            // Ensure password and enabled status are always valid
+            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setEnabled(true);
+            admin = userRepository.save(admin);
+            log.info("🎉 [SEED] Admin synchronized: admin@workpay.io / admin123");
         }
 
         // 2. Seed Default Employees if none exist
