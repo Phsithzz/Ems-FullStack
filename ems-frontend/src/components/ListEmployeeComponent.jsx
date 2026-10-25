@@ -1,25 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { deleteEmployee, listEmployees } from "../services/EmployeeService";
+import React, { useState } from "react";
+import { useEmployees, useDeleteEmployeeMutation } from "../hooks/useEmployeeQueries";
 import { useNavigate } from "react-router-dom";
 
 const ListEmployeeComponent = ({ searchQuery }) => {
-  const [employees, setEmployees] = useState([]);
+  const { data: employees = [], isLoading } = useEmployees();
+  const deleteMutation = useDeleteEmployeeMutation();
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [openMenuId, setOpenMenuId] = useState(null);
   const navigator = useNavigate();
-
-  useEffect(() => {
-    getAllEmployees();
-  }, []);
-
-  const getAllEmployees = async () => {
-    try {
-      const response = await listEmployees();
-      setEmployees(response.data);
-    } catch (err) {
-      console.error("Error fetching employees:", err);
-    }
-  };
 
   const addNewEmployee = () => {
     navigator("/add-employee");
@@ -29,14 +17,13 @@ const ListEmployeeComponent = ({ searchQuery }) => {
     navigator(`/edit-employee/${id}`);
   };
 
-  const removeEmployee = async (id) => {
+  const removeEmployee = (id) => {
     if (window.confirm("Are you sure you want to remove this employee?")) {
-      try {
-        await deleteEmployee(id);
-        getAllEmployees();
-      } catch (err) {
-        console.error("Error deleting employee:", err);
-      }
+      deleteMutation.mutate(id, {
+        onError: (err) => {
+          console.error("Error deleting employee:", err);
+        },
+      });
     }
   };
 

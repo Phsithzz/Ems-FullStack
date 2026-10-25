@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
-  getCards,
-  getWallets,
-  createCard,
-  updateCardStatus,
-  authorizeCard,
-  settleCard,
-} from "../services/FintechService";
-import { listEmployees } from "../services/EmployeeService";
+  useCards,
+  useWallets,
+  useCardStatusMutation,
+  useCardAuthorizeMutation,
+  useCreateCardMutation,
+} from "../hooks/useFintechQueries";
+import { useEmployees } from "../hooks/useEmployeeQueries";
+import { settleCard } from "../services/FintechService";
 
 const generateUUID = () => {
   return "idemp-card-" + ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
@@ -16,17 +16,19 @@ const generateUUID = () => {
 };
 
 const CardManagementComponent = () => {
-  const [cards, setCards] = useState([]);
-  const [wallets, setWallets] = useState([]);
-  const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: cards = [], isLoading: cardsLoading } = useCards();
+  const { data: wallets = [] } = useWallets();
+  const { data: employees = [] } = useEmployees();
+
+  const cardStatusMutation = useCardStatusMutation();
+  const cardAuthorizeMutation = useCardAuthorizeMutation();
+  const createCardMutation = useCreateCardMutation();
 
   // Swipe / POS Simulation Modal
   const [selectedCardForSwipe, setSelectedCardForSwipe] = useState(null);
   const [merchantName, setMerchantName] = useState("AWS Cloud Services");
   const [swipeAmount, setSwipeAmount] = useState("49.99");
   const [swipeResult, setSwipeResult] = useState(null);
-  const [swipeLoading, setSwipeLoading] = useState(false);
 
   // Issue Card Modal
   const [showIssueModal, setShowIssueModal] = useState(false);
@@ -36,106 +38,80 @@ const CardManagementComponent = () => {
   const [cardType, setCardType] = useState("PAYPULSE_BLACK_VIRTUAL");
   const [dailyLimit, setDailyLimit] = useState("5000.00");
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const [cRes, wRes, eRes] = await Promise.all([
-        getCards(),
-        getWallets(),
-        listEmployees(),
-      ]);
-      setCards(cRes.data || []);
-      setWallets(wRes.data || []);
-      setEmployees(eRes.data || []);
-      if (wRes.data && wRes.data.length > 0) {
-        setIssueWalletId(wRes.data[0].id);
-      }
-    } catch (err) {
-      console.error("Failed to fetch corporate cards", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  const handleToggleFreeze = async (card) => {
-    const nextStatus = card.cardStatus === "ACTIVE" ? "FROZEN" : "ACTIVE";
-    try {
-      await updateCardStatus(card.id, nextStatus);
-      setCards(
-        cards.map((c) => (c.id === card.id ? { ...c, cardStatus: nextStatus } : c))
-      );
-    } catch (err) {
-      alert("Failed to update card status: " + err.message);
+    if (wallets.length > 0 && !issueWalletId) {
+      setIssueWalletId(wallets[0].id);
     }
+  }, [wallets, issueWalletId]);
+
+  const handleToggleFreeze = (card) => {
+    const nextStatus = card.cardStatus === "ACTIVE" ? "FROZEN" : "ACTIVE";
+    cardStatusMutation.mutate(
+      { cardId: card.id, status: nextStatus },
+      {
+        onError: (err) => {
+          alert("Failed to update card status: " + err.message);
+        },
+      }
+    );
   };
 
-  const handleSimulateSwipe = async () => {
+  const handleSimulateSwipe = () => {
     if (!selectedCardForSwipe) return;
-    setSwipeLoading(true);
     setSwipeResult(null);
 
-    try {
-      const idempKey = generateUUID();
-      const res = await authorizeCard(
-        selectedCardForSwipe.id,
-        {
+    const idempKey = generateUUID();
+    cardAuthorizeMutation.mutate(
+      {
+        cardId: selectedCardForSwipe.id,
+        data: {
           merchantName,
           amount: parseFloat(swipeAmount),
           currency: "USD",
         },
-        idempKey
-      );
-
-      setSwipeResult(res.data);
-      // Refresh cards list to see new spend & hold
-      const cRes = await getCards();
-      setCards(cRes.data || []);
-    } catch (err) {
-      const msg = err.response?.data?.message || err.message;
-      setSwipeResult({
-        status: "DECLINED",
-        declineReason: String(msg),
-      });
-    } finally {
-      setSwipeLoading(false);
-    }
+        idempotencyKey: idempKey,
+      },
+      {
+        onSuccess: (res) => {
+          setSwipeResult(res.data);
+        },
+        onError: (err) => {
+          const msg = err.response?.data?.message || err.message;
+          setSwipeResult({
+            status: "DECLINED",
+            declineReason: String(msg),
+          });
+        },
+      }
+    );
   };
 
-  const handleSettle = async (txnId) => {
-    try {
-      await settleCard(txnId);
-      alert("Transaction Settled and Captured!");
-      fetchData();
-    } catch (err) {
-      alert("Settlement failed: " + err.message);
-    }
-  };
-
-  const handleIssueCard = async (e) => {
+  const handleIssueCard = (e) => {
     e.preventDefault();
     if (!cardHolderName) {
       alert("Please enter cardholder name");
       return;
     }
-    try {
-      await createCard({
+
+    createCardMutation.mutate(
+      {
         employeeId: issueEmployeeId ? parseInt(issueEmployeeId) : null,
         walletId: parseInt(issueWalletId),
         cardHolderName,
         cardType,
         dailyLimit: parseFloat(dailyLimit),
         monthlyLimit: parseFloat(dailyLimit) * 10,
-      });
-      setShowIssueModal(false);
-      setCardHolderName("");
-      fetchData();
-    } catch (err) {
-      alert("Failed to issue card: " + (err.response?.data?.message || err.message));
-    }
+      },
+      {
+        onSuccess: () => {
+          setShowIssueModal(false);
+          setCardHolderName("");
+        },
+        onError: (err) => {
+          alert("Failed to issue card: " + (err.response?.data?.message || err.message));
+        },
+      }
+    );
   };
 
   return (
@@ -155,7 +131,7 @@ const CardManagementComponent = () => {
             Corporate Expense & Virtual Cards
           </h1>
           <p className="text-slate-400 text-sm mt-1 max-w-xl">
-            Real-time balance holds, dynamic spend limits, zero-downtime card freeze, and POS simulation.
+            Real-time balance holds, dynamic spend limits, zero-downtime card freeze, and TanStack Query state synchronization.
           </p>
         </div>
 
@@ -263,7 +239,8 @@ const CardManagementComponent = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleToggleFreeze(card)}
-                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  disabled={cardStatusMutation.isPending}
+                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer disabled:opacity-50 ${
                     isFrozen
                       ? "bg-emerald-600 hover:bg-emerald-500 text-white"
                       : "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700"
@@ -350,11 +327,11 @@ const CardManagementComponent = () => {
             <div className="flex gap-2">
               <button
                 type="button"
-                disabled={swipeLoading}
+                disabled={cardAuthorizeMutation.isPending}
                 onClick={handleSimulateSwipe}
                 className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm rounded-xl transition-all shadow-md shadow-amber-500/20 disabled:opacity-50 cursor-pointer"
               >
-                {swipeLoading ? "Contacting Network..." : "Simulate POS Terminal Authorization"}
+                {cardAuthorizeMutation.isPending ? "Contacting Network..." : "Simulate POS Terminal Authorization"}
               </button>
             </div>
           </div>
@@ -443,9 +420,10 @@ const CardManagementComponent = () => {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm rounded-xl transition-all shadow-md shadow-amber-500/20 cursor-pointer"
+                  disabled={createCardMutation.isPending}
+                  className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm rounded-xl transition-all shadow-md shadow-amber-500/20 cursor-pointer disabled:opacity-50"
                 >
-                  Generate & Activate Virtual Card
+                  {createCardMutation.isPending ? "Issuing Card..." : "Generate & Activate Virtual Card"}
                 </button>
               </div>
             </form>

@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { getWallets, transferFunds, getTransactions } from "../services/FintechService";
+import {
+  useWallets,
+  useTransactions,
+  useTransferMutation,
+} from "../hooks/useFintechQueries";
 
 const generateUUID = () => {
   return "idemp-" + ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
@@ -8,40 +12,24 @@ const generateUUID = () => {
 };
 
 const PaymentComponent = () => {
-  const [wallets, setWallets] = useState([]);
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showTransferModal, setShowTransferModal] = useState(false);
+  const { data: wallets = [], isLoading: walletsLoading } = useWallets();
+  const { data: transactions = [], isLoading: txnsLoading, refetch: refetchTxns } = useTransactions();
+  const transferMutation = useTransferMutation();
 
-  // Transfer Form State
+  const [showTransferModal, setShowTransferModal] = useState(false);
   const [sourceWalletId, setSourceWalletId] = useState("");
   const [targetWalletId, setTargetWalletId] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [idempotencyKey, setIdempotencyKey] = useState(generateUUID());
-  const [transferLoading, setTransferLoading] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState(null);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const [walletRes, txnRes] = await Promise.all([getWallets(), getTransactions()]);
-      setWallets(walletRes.data || []);
-      setTransactions(txnRes.data || []);
-      if (walletRes.data && walletRes.data.length >= 2) {
-        setSourceWalletId(walletRes.data[0].id);
-        setTargetWalletId(walletRes.data[1].id);
-      }
-    } catch (err) {
-      console.error("Failed to load fintech data", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (wallets.length >= 2 && !sourceWalletId) {
+      setSourceWalletId(wallets[0].id);
+      setTargetWalletId(wallets[1].id);
+    }
+  }, [wallets, sourceWalletId]);
 
   const handleOpenTransfer = () => {
     setIdempotencyKey(generateUUID());
@@ -59,43 +47,39 @@ const PaymentComponent = () => {
       return;
     }
 
-    setTransferLoading(true);
     setFeedbackMsg(null);
 
-    try {
-      const payload = {
-        sourceWalletId: parseInt(sourceWalletId),
-        targetWalletId: parseInt(targetWalletId),
-        amount: parseFloat(amount),
-        currency: "USDT",
-        description: description || "PayPulse Instant Transfer",
-      };
+    const payload = {
+      sourceWalletId: parseInt(sourceWalletId),
+      targetWalletId: parseInt(targetWalletId),
+      amount: parseFloat(amount),
+      currency: "USDT",
+      description: description || "PayPulse Instant Transfer",
+    };
 
-      const res = await transferFunds(payload, idempotencyKey);
-      
-      const successNotice = isDuplicateTest
-        ? `🎯 [Idempotency Guard Active] Server returned cached transaction (No duplicate debit!): ${res.data.transactionReference}`
-        : `✅ Transfer successful! Ref: ${res.data.transactionReference}`;
+    transferMutation.mutate(
+      { data: payload, idempotencyKey },
+      {
+        onSuccess: (res) => {
+          const successNotice = isDuplicateTest
+            ? `🎯 [Idempotency Guard Active] Server returned cached transaction (No duplicate debit!): ${res.data.transactionReference}`
+            : `✅ Transfer successful! Ref: ${res.data.transactionReference}`;
 
-      setFeedbackMsg({ type: "success", text: successNotice });
-      
-      // Refresh wallets and transactions
-      const [wRes, tRes] = await Promise.all([getWallets(), getTransactions()]);
-      setWallets(wRes.data || []);
-      setTransactions(tRes.data || []);
-
-      if (!isDuplicateTest) {
-        // Generate new key for the next payment
-        setIdempotencyKey(generateUUID());
+          setFeedbackMsg({ type: "success", text: successNotice });
+          if (!isDuplicateTest) {
+            setIdempotencyKey(generateUUID());
+          }
+        },
+        onError: (err) => {
+          const errorMsg =
+            err.response?.data?.message || err.response?.data?.error || "Transfer failed. Check balance or server connection.";
+          setFeedbackMsg({ type: "error", text: String(errorMsg) });
+        },
       }
-    } catch (err) {
-      const errorMsg =
-        err.response?.data?.message || err.response?.data || "Transfer failed. Check balance or server connection.";
-      setFeedbackMsg({ type: "error", text: String(errorMsg) });
-    } finally {
-      setTransferLoading(false);
-    }
+    );
   };
+
+  const loading = walletsLoading || txnsLoading;
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -114,7 +98,7 @@ const PaymentComponent = () => {
             Treasury & Payouts Engine
           </h1>
           <p className="text-slate-400 text-sm mt-1 max-w-xl">
-            High-concurrency payout infrastructure with zero-deadlock row locks and UUID idempotency-key deduplication.
+            High-concurrency payout infrastructure with zero-deadlock row locks, UUID idempotency-key deduplication, and TanStack Query state caching.
           </p>
         </div>
 
@@ -202,7 +186,7 @@ const PaymentComponent = () => {
           </div>
 
           <button
-            onClick={fetchData}
+            onClick={() => refetchTxns()}
             className="text-xs font-medium text-slate-500 hover:text-amber-600 flex items-center gap-1 cursor-pointer transition-colors"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -400,18 +384,18 @@ const PaymentComponent = () => {
             <div className="flex flex-col gap-2 pt-2">
               <button
                 type="button"
-                disabled={transferLoading}
+                disabled={transferMutation.isPending}
                 onClick={() => handleExecuteTransfer(false)}
                 className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm rounded-xl transition-all shadow-md shadow-amber-500/20 disabled:opacity-50 cursor-pointer"
               >
-                {transferLoading ? "Processing Transfer..." : "Submit Payment Transfer"}
+                {transferMutation.isPending ? "Processing Transfer..." : "Submit Payment Transfer"}
               </button>
 
               <button
                 type="button"
-                disabled={transferLoading}
+                disabled={transferMutation.isPending}
                 onClick={() => handleExecuteTransfer(true)}
-                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all cursor-pointer border border-slate-200"
+                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all cursor-pointer border border-slate-200 disabled:opacity-50"
               >
                 ⚡ Test Duplicate Submit with Same Idempotency-Key
               </button>

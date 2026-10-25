@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { createEmployee, getEmployee, updateEmployee } from "../services/EmployeeService";
+import {
+  useEmployee,
+  useCreateEmployeeMutation,
+  useUpdateEmployeeMutation,
+} from "../hooks/useEmployeeQueries";
 import { useNavigate, useParams, Link } from "react-router-dom";
 
 const EmployeeComponent = () => {
@@ -10,6 +14,10 @@ const EmployeeComponent = () => {
   const { id } = useParams();
   const navigator = useNavigate();
 
+  const { data: existingEmployee } = useEmployee(id);
+  const createMutation = useCreateEmployeeMutation();
+  const updateMutation = useUpdateEmployeeMutation();
+
   const [error, setError] = useState({
     firstName: "",
     lastName: "",
@@ -17,37 +25,32 @@ const EmployeeComponent = () => {
   });
 
   useEffect(() => {
-    if (id) {
-      const fetchEmployee = async () => {
-        try {
-          const response = await getEmployee(id);
-          setFirstName(response.data.firstName);
-          setLastName(response.data.lastName);
-          setEmail(response.data.email);
-        } catch (err) {
-          console.error("Error fetching employee:", err);
-        }
-      };
-
-      fetchEmployee();
+    if (existingEmployee) {
+      setFirstName(existingEmployee.firstName || "");
+      setLastName(existingEmployee.lastName || "");
+      setEmail(existingEmployee.email || "");
     }
-  }, [id]);
+  }, [existingEmployee]);
 
-  const saveOrUpdateEmployee = async (e) => {
+  const saveOrUpdateEmployee = (e) => {
     e.preventDefault();
 
     if (validateForm()) {
       const employee = { firstName, lastName, email };
 
-      try {
-        if (id) {
-          await updateEmployee(id, employee);
-        } else {
-          await createEmployee(employee);
-        }
-        navigator("/employees");
-      } catch (err) {
-        console.error("Error saving employee:", err);
+      if (id) {
+        updateMutation.mutate(
+          { id, data: employee },
+          {
+            onSuccess: () => navigator("/employees"),
+            onError: (err) => console.error("Error updating employee:", err),
+          }
+        );
+      } else {
+        createMutation.mutate(employee, {
+          onSuccess: () => navigator("/employees"),
+          onError: (err) => console.error("Error creating employee:", err),
+        });
       }
     }
   };

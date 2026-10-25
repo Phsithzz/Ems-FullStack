@@ -1,31 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { getLedgerJournals, getLedgerAudit } from "../services/FintechService";
+import React, { useState } from "react";
+import { useLedgerJournals, useLedgerAudit } from "../hooks/useFintechQueries";
 
 const LedgerComponent = () => {
-  const [journals, setJournals] = useState([]);
-  const [audit, setAudit] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data: journals = [], isLoading: journalsLoading, refetch: refetchJournals } = useLedgerJournals();
+  const { data: audit = null, isLoading: auditLoading, refetch: refetchAudit } = useLedgerAudit();
   const [expandedId, setExpandedId] = useState(null);
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const [jRes, aRes] = await Promise.all([getLedgerJournals(), getLedgerAudit()]);
-      setJournals(jRes.data || []);
-      setAudit(aRes.data || null);
-    } catch (err) {
-      console.error("Failed to fetch ledger audit data", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
+  };
+
+  const handleRefresh = () => {
+    refetchJournals();
+    refetchAudit();
   };
 
   return (
@@ -45,12 +32,12 @@ const LedgerComponent = () => {
             Financial Ledger & Audit Trail
           </h1>
           <p className="text-slate-400 text-sm mt-1 max-w-xl">
-            Mathematical zero-discrepancy double-entry ledger ensuring Sum(Debit) equals Sum(Credit) across all accounts.
+            Mathematical zero-discrepancy double-entry ledger ensuring Sum(Debit) equals Sum(Credit) across all accounts, synced via TanStack Query.
           </p>
         </div>
 
         <button
-          onClick={fetchData}
+          onClick={handleRefresh}
           className="flex items-center gap-2 px-5 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm rounded-xl border border-slate-700 shadow-md transition-all cursor-pointer"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

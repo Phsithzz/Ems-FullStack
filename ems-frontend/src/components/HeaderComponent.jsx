@@ -1,18 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { getAuthUser, logoutApi } from "../services/AuthService";
+import React from "react";
+import { useAuthStore } from "../store/useAuthStore";
 import { Link, useNavigate } from "react-router-dom";
 
 const HeaderComponent = ({ searchQuery, setSearchQuery }) => {
-  const [currentUser, setCurrentUser] = useState(null);
+  const { user: currentUser, logout } = useAuthStore();
   const navigator = useNavigate();
 
-  useEffect(() => {
-    setCurrentUser(getAuthUser());
-  }, []);
-
   const handleLogout = async () => {
-    await logoutApi();
-    setCurrentUser(null);
+    await logout();
     navigator("/login");
   };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { loginApi, verifyOtpApi, resendOtpApi } from "../services/AuthService";
+import { useAuthStore } from "../store/useAuthStore";
 import { useNavigate, Link } from "react-router-dom";
 
 const LoginComponent = () => {
@@ -115,8 +116,16 @@ const LoginComponent = () => {
     setErrorMessage("");
     try {
       setLoading(true);
-      await verifyOtpApi(email, code);
+      const res = await verifyOtpApi(email, code);
       setLoading(false);
+
+      if (res.data) {
+        useAuthStore.getState().setUser({
+          email: res.data.email,
+          name: res.data.name,
+          role: res.data.role,
+        });
+      }
 
       setSuccessMessage("Authentication verified successfully! Redirecting...");
       setTimeout(() => {
