@@ -15,7 +15,7 @@ public class CreateCardRequestDto {
     private Long employeeId;
     private Long walletId;
     private String cardHolderName;
-    private String cardType; // "BINANCE_BLACK_VIRTUAL", "BINANCE_GOLD_DEBIT"
+    private String cardType; // "PAYPULSE_BLACK_VIRTUAL", "PAYPULSE_PLATINUM_DEBIT"
     private BigDecimal dailyLimit;
     private BigDecimal monthlyLimit;
 }

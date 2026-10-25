@@ -71,7 +71,7 @@ const ListEmployeeComponent = ({ searchQuery }) => {
     const avatar = avatarList[index % avatarList.length];
     const hiredDate = `10/${((index * 3 + 12) % 28) + 1}/24`;
     const phone = `(555) 019-${1000 + (employee.id * 13) % 9000}`;
-    const cardStatus = index % 2 === 0 ? "Active Binance Card" : "Pending Issue";
+    const cardStatus = index % 2 === 0 ? "Active Corporate Card" : "Pending Issue";
 
     return { dept, role, avatar, hiredDate, phone, cardStatus };
   };

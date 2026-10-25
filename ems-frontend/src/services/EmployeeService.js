@@ -1,31 +1,13 @@
-import axios from "axios";
-import { getAuthToken } from "./AuthService";
+import apiClient from "./apiClient";
 
-const REST_API_BASE_URL =
-  import.meta.env.VITE_BASE_URL || "http://localhost:8080/api/employees";
+export const listEmployees = () => apiClient.get("/employees");
 
-// Add Axios Request Interceptor to automatically attach Bearer token
-axios.interceptors.request.use(
-  (config) => {
-    const token = getAuthToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+export const createEmployee = (employee) => apiClient.post("/employees", employee);
 
-export const listEmployees = () => axios.get(REST_API_BASE_URL);
-
-export const createEmployee = (employee) =>
-  axios.post(REST_API_BASE_URL, employee);
-
-export const getEmployee = (employeeId) =>
-  axios.get(`${REST_API_BASE_URL}/${employeeId}`);
+export const getEmployee = (employeeId) => apiClient.get(`/employees/${employeeId}`);
 
 export const updateEmployee = (employeeId, employee) =>
-  axios.put(`${REST_API_BASE_URL}/${employeeId}`, employee);
+  apiClient.put(`/employees/${employeeId}`, employee);
 
 export const deleteEmployee = (employeeId) =>
-  axios.delete(`${REST_API_BASE_URL}/${employeeId}`);
+  apiClient.delete(`/employees/${employeeId}`);

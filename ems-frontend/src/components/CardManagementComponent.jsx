@@ -33,7 +33,7 @@ const CardManagementComponent = () => {
   const [issueEmployeeId, setIssueEmployeeId] = useState("");
   const [issueWalletId, setIssueWalletId] = useState("");
   const [cardHolderName, setCardHolderName] = useState("");
-  const [cardType, setCardType] = useState("BINANCE_BLACK_VIRTUAL");
+  const [cardType, setCardType] = useState("PAYPULSE_BLACK_VIRTUAL");
   const [dailyLimit, setDailyLimit] = useState("5000.00");
 
   const fetchData = async () => {
@@ -145,7 +145,7 @@ const CardManagementComponent = () => {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              Binance Corporate Cards
+              PayPulse Corporate Cards
             </span>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/30">
               Virtual Visa/Mastercard Emulation
@@ -208,7 +208,7 @@ const CardManagementComponent = () => {
                     {card.cardStatus}
                   </span>
                   <span className="font-extrabold text-xs tracking-wider text-amber-400">
-                    BINANCE
+                    PAYPULSE
                   </span>
                 </div>
               </div>
@@ -425,8 +425,8 @@ const CardManagementComponent = () => {
                   onChange={(e) => setCardType(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                 >
-                  <option value="BINANCE_BLACK_VIRTUAL">Binance Black Virtual (Tier 1)</option>
-                  <option value="BINANCE_GOLD_DEBIT">Binance Gold Corporate (Tier 2)</option>
+                  <option value="PAYPULSE_BLACK_VIRTUAL">PayPulse Black Virtual (Tier 1)</option>
+                  <option value="PAYPULSE_PLATINUM_DEBIT">PayPulse Platinum Corporate (Tier 2)</option>
                 </select>
               </div>
 

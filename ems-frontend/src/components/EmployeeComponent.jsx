@@ -109,7 +109,7 @@ const EmployeeComponent = () => {
             <p className="text-xs text-slate-400 mt-0.5">
               {id
                 ? "Update organization records for this team member."
-                : "Fill in candidate details to enroll into Binance Pay & Card EMS."}
+                : "Fill in candidate details to enroll into PayPulse Platform."}
             </p>
           </div>
         </div>
@@ -173,7 +173,7 @@ const EmployeeComponent = () => {
             </label>
             <input
               type="email"
-              placeholder="bessie.cooper@binance.com"
+              placeholder="bessie.cooper@paypulse.io"
               name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

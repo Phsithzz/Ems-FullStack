@@ -79,7 +79,7 @@ const SidebarComponent = () => {
         {
           name: "Payroll & Payouts",
           path: "/payroll",
-          badge: "Binance Pay",
+          badge: "PayPulse Pay",
           icon: (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -160,14 +160,14 @@ const SidebarComponent = () => {
         <div className="h-20 flex items-center px-7 border-b border-slate-50">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#FF5C35] to-[#FF844B] flex items-center justify-center text-white font-black text-lg shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform">
-              B
+              P
             </div>
             <div>
               <span className="font-extrabold text-slate-800 text-base tracking-tight block">
-                Binance<span className="text-[#FF5C35]">Pay</span>
+                Pay<span className="text-[#FF5C35]">Pulse</span>
               </span>
               <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block -mt-0.5">
-                Pay & Card EMS
+                Enterprise Fintech
               </span>
             </div>
           </Link>

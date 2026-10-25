@@ -10,5 +10,7 @@ public interface AuthService {
     AuthResponseDto login(LoginRequestDto loginDto);
     AuthResponseDto verifyOtp(VerifyOtpRequestDto verifyDto);
     AuthResponseDto resendOtp(String email);
+    AuthResponseDto refreshToken(String refreshToken);
+    void logout(String refreshToken);
     AuthResponseDto getMe(String email);
 }

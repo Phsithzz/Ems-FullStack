@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import EmployeeComponent from "./components/EmployeeComponent";
 import FooterComponent from "./components/FooterComponent";
@@ -9,12 +9,20 @@ import LoginComponent from "./components/LoginComponent";
 import PaymentComponent from "./components/PaymentComponent";
 import CardManagementComponent from "./components/CardManagementComponent";
 import LedgerComponent from "./components/LedgerComponent";
+import { refreshTokenApi } from "./services/AuthService";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 const AppContent = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const isAuthPage = location.pathname === "/login";
+
+  // Attempt silent refresh on app startup using HttpOnly cookie
+  useEffect(() => {
+    refreshTokenApi().catch(() => {
+      // If no valid refresh cookie, user stays as guest or redirects to login when accessing protected resources
+    });
+  }, []);
 
   if (isAuthPage) {
     return (

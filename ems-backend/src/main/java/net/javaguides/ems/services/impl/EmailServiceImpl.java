@@ -18,13 +18,13 @@ public class EmailServiceImpl implements EmailService {
     @Autowired(required = false)
     private JavaMailSender mailSender;
 
-    @Value("${spring.mail.username:noreply@binance-ems.com}")
+    @Value("${spring.mail.username:noreply@paypulse.io}")
     private String fromEmail;
 
     @Override
     public void sendOtpEmail(String toEmail, String otpCode) {
         log.info("==========================================================");
-        log.info("📧 [BINANCE PAY & CARD 2FA DISPATCH]");
+        log.info("📧 [PAYPULSE 2FA DISPATCH]");
         log.info("   Recipient : {}", toEmail);
         log.info("   OTP Code  : >>> {} <<< (Valid for 5 minutes)", otpCode);
         log.info("==========================================================");
@@ -40,21 +40,21 @@ public class EmailServiceImpl implements EmailService {
 
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("🔒 [Binance Pay & Card] Your Two-Factor Verification Code");
+            helper.setSubject("🔒 [PayPulse] Your Two-Factor Verification Code");
 
             String htmlContent = "<div style='font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; padding: 30px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;'>"
                     + "<div style='display: flex; align-items: center; margin-bottom: 24px;'>"
-                    + "<div style='background-color: #FF5C35; color: white; width: 40px; height: 40px; border-radius: 10px; font-weight: bold; font-size: 20px; text-align: center; line-height: 40px;'>B</div>"
-                    + "<span style='margin-left: 12px; font-size: 18px; font-weight: bold; color: #1e293b;'>Binance<span style='color: #FF5C35;'>Pay</span> & Card</span>"
+                    + "<div style='background-color: #FF5C35; color: white; width: 40px; height: 40px; border-radius: 10px; font-weight: bold; font-size: 20px; text-align: center; line-height: 40px;'>P</div>"
+                    + "<span style='margin-left: 12px; font-size: 18px; font-weight: bold; color: #1e293b;'>Pay<span style='color: #FF5C35;'>Pulse</span> Platform</span>"
                     + "</div>"
                     + "<h2 style='color: #0f172a; margin-top: 0;'>Two-Factor Verification Code</h2>"
-                    + "<p style='color: #64748b; font-size: 14px;'>You requested a secure login or transaction authentication for your Binance Pay & Card account.</p>"
+                    + "<p style='color: #64748b; font-size: 14px;'>You requested a secure login or transaction authentication for your PayPulse account.</p>"
                     + "<div style='background-color: #FFF4EE; border: 1px dashed #FF844B; border-radius: 12px; padding: 18px; text-align: center; margin: 24px 0;'>"
                     + "<span style='font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #FF5C35;'>" + otpCode + "</span>"
                     + "</div>"
                     + "<p style='color: #64748b; font-size: 13px;'>This code is valid for <strong>5 minutes</strong>. If you did not make this request, please change your password immediately.</p>"
                     + "<hr style='border: none; border-top: 1px solid #f1f5f9; margin: 24px 0;' />"
-                    + "<p style='color: #94a3b8; font-size: 11px; text-align: center;'>© 2026 Binance Pay & Card Platform • Enterprise Security</p>"
+                    + "<p style='color: #94a3b8; font-size: 11px; text-align: center;'>© 2026 PayPulse Platform • Enterprise Security</p>"
                     + "</div>";
 
             helper.setText(htmlContent, true);

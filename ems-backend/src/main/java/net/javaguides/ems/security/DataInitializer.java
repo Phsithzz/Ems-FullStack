@@ -48,13 +48,13 @@ public class DataInitializer implements CommandLineRunner {
         User admin;
         if (userRepository.count() == 0) {
             admin = new User();
-            admin.setName("Binance Pay Admin");
-            admin.setEmail("admin@binance.com");
+            admin.setName("PayPulse System Admin");
+            admin.setEmail("admin@paypulse.io");
             admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setRole("ROLE_ADMIN");
             admin.setEnabled(true);
             admin = userRepository.save(admin);
-            log.info("🎉 [SEED] Admin created: admin@binance.com / admin123");
+            log.info("🎉 [SEED] Admin created: admin@paypulse.io / admin123");
         } else {
             admin = userRepository.findAll().get(0);
         }
@@ -63,9 +63,9 @@ public class DataInitializer implements CommandLineRunner {
         Employee emp1 = null;
         Employee emp2 = null;
         if (employeeRepository.count() == 0) {
-            emp1 = new Employee(null, "Alice", "Smith", "alice.smith@binance.com");
-            emp2 = new Employee(null, "Bob", "Jones", "bob.jones@binance.com");
-            Employee emp3 = new Employee(null, "Charlie", "Davis", "charlie.davis@binance.com");
+            emp1 = new Employee(null, "Alice", "Smith", "alice.smith@paypulse.io");
+            emp2 = new Employee(null, "Bob", "Jones", "bob.jones@paypulse.io");
+            Employee emp3 = new Employee(null, "Charlie", "Davis", "charlie.davis@paypulse.io");
             emp1 = employeeRepository.save(emp1);
             emp2 = employeeRepository.save(emp2);
             employeeRepository.save(emp3);
@@ -78,7 +78,7 @@ public class DataInitializer implements CommandLineRunner {
         if (walletRepository.count() == 0) {
             Wallet treasury = new Wallet();
             treasury.setAccountNumber("WAL-MAIN-TREASURY");
-            treasury.setWalletName("Binance Corporate Treasury Reserve");
+            treasury.setWalletName("PayPulse Corporate Treasury Reserve");
             treasury.setCurrency("USDT");
             treasury.setBalance(new BigDecimal("1000000.0000"));
             treasury.setLockedBalance(BigDecimal.ZERO);
@@ -88,7 +88,7 @@ public class DataInitializer implements CommandLineRunner {
 
             Wallet opsPayroll = new Wallet();
             opsPayroll.setAccountNumber("WAL-OPS-PAYROLL");
-            opsPayroll.setWalletName("TH Regional Operations & Payroll Pool");
+            opsPayroll.setWalletName("Global Operations & Payroll Pool");
             opsPayroll.setCurrency("USDT");
             opsPayroll.setBalance(new BigDecimal("250000.0000"));
             opsPayroll.setLockedBalance(BigDecimal.ZERO);
@@ -137,7 +137,7 @@ public class DataInitializer implements CommandLineRunner {
             card1.setExpiryMonth(12);
             card1.setExpiryYear(2028);
             card1.setCvvHash(passwordEncoder.encode("382"));
-            card1.setCardType("BINANCE_BLACK_VIRTUAL");
+            card1.setCardType("PAYPULSE_BLACK_VIRTUAL");
             card1.setCardStatus("ACTIVE");
             card1.setDailyLimit(new BigDecimal("5000.00"));
             card1.setDailySpent(new BigDecimal("350.00"));
@@ -148,13 +148,13 @@ public class DataInitializer implements CommandLineRunner {
 
             CorporateCard card2 = new CorporateCard();
             card2.setCardNumber("5214 •••• •••• 4172");
-            card2.setCardHolderName("Binance Admin Executive");
+            card2.setCardHolderName("PayPulse Treasury Executive");
             card2.setEmployee(null);
             card2.setWallet(treasury);
             card2.setExpiryMonth(8);
             card2.setExpiryYear(2029);
             card2.setCvvHash(passwordEncoder.encode("889"));
-            card2.setCardType("BINANCE_GOLD_DEBIT");
+            card2.setCardType("PAYPULSE_PLATINUM_DEBIT");
             card2.setCardStatus("ACTIVE");
             card2.setDailyLimit(new BigDecimal("20000.00"));
             card2.setDailySpent(BigDecimal.ZERO);

@@ -68,7 +68,7 @@ const PaymentComponent = () => {
         targetWalletId: parseInt(targetWalletId),
         amount: parseFloat(amount),
         currency: "USDT",
-        description: description || "Binance Pay Instant Transfer",
+        description: description || "PayPulse Instant Transfer",
       };
 
       const res = await transferFunds(payload, idempotencyKey);
@@ -104,7 +104,7 @@ const PaymentComponent = () => {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              Binance Pay Core Engine
+              PayPulse Core Engine
             </span>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
               Pessimistic Row Lock & Idempotent

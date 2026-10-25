@@ -4,6 +4,7 @@ import net.javaguides.ems.dto.AuthResponseDto;
 import net.javaguides.ems.dto.LoginRequestDto;
 import net.javaguides.ems.dto.RegisterRequestDto;
 import net.javaguides.ems.dto.VerifyOtpRequestDto;
+import net.javaguides.ems.entity.RefreshToken;
 import net.javaguides.ems.entity.User;
 import net.javaguides.ems.exception.ResourceNotFoundException;
 import net.javaguides.ems.repository.UserRepository;
@@ -11,29 +12,39 @@ import net.javaguides.ems.security.JwtTokenProvider;
 import net.javaguides.ems.services.AuthService;
 import net.javaguides.ems.services.EmailService;
 import net.javaguides.ems.services.OtpService;
+import net.javaguides.ems.services.RefreshTokenService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class AuthServiceImpl implements AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final OtpService otpService;
     private final EmailService emailService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     public AuthServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder,
                            OtpService otpService,
                            EmailService emailService,
-                           JwtTokenProvider jwtTokenProvider) {
+                           JwtTokenProvider jwtTokenProvider,
+                           RefreshTokenService refreshTokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
         this.emailService = emailService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @Override
@@ -56,14 +67,12 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         user.setRole(role);
         user.setEnabled(true);
+        user.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(user);
 
-        // Auto initiate OTP for seamless activation/login
-        String otp = otpService.generateAndStoreOtp(user.getEmail());
-        emailService.sendOtpEmail(user.getEmail(), otp);
-
-        return AuthResponseDto.otpSent(user.getEmail(), "Registration successful. 2FA OTP code sent to your email.");
+        log.info("👤 [REGISTER SUCCESS] User registered: {}", user.getEmail());
+        return AuthResponseDto.authenticated(null, user.getEmail(), user.getName(), user.getRole(), "Registration successful! You can now log in.");
     }
 
     @Override
@@ -98,10 +107,24 @@ public class AuthServiceImpl implements AuthService {
             throw new BadCredentialsException("Invalid or expired OTP verification code.");
         }
 
-        // Issue signed JWT access token upon successful 2FA
+        // Issue short-lived Access Token (15 min)
         String token = jwtTokenProvider.generateToken(user.getEmail(), user.getName(), user.getRole());
+        Long expiresIn = jwtTokenProvider.getExpirationMs() / 1000;
 
-        return AuthResponseDto.authenticated(token, user.getEmail(), user.getName(), user.getRole(), "2FA Verification successful. Welcome back!");
+        // Issue long-lived Refresh Token (7 days) with DB rotation tracking
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
+        AuthResponseDto response = AuthResponseDto.authenticated(
+                token,
+                expiresIn,
+                user.getEmail(),
+                user.getName(),
+                user.getRole(),
+                "2FA Verification successful. Welcome back!"
+        );
+        response.setRefreshToken(refreshToken.getToken());
+
+        return response;
     }
 
     @Override
@@ -120,6 +143,39 @@ public class AuthServiceImpl implements AuthService {
         emailService.sendOtpEmail(normalizedEmail, otp);
 
         return AuthResponseDto.otpSent(normalizedEmail, "New OTP code sent to your email.");
+    }
+
+    @Override
+    public AuthResponseDto refreshToken(String requestRefreshToken) {
+        if (requestRefreshToken == null || requestRefreshToken.trim().isEmpty()) {
+            throw new IllegalArgumentException("Refresh token is required.");
+        }
+
+        // Rotate token (RTR)
+        RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(requestRefreshToken.trim());
+        User user = newRefreshToken.getUser();
+
+        String newAccessToken = jwtTokenProvider.generateToken(user.getEmail(), user.getName(), user.getRole());
+        Long expiresIn = jwtTokenProvider.getExpirationMs() / 1000;
+
+        AuthResponseDto response = AuthResponseDto.authenticated(
+                newAccessToken,
+                expiresIn,
+                user.getEmail(),
+                user.getName(),
+                user.getRole(),
+                "Access token refreshed successfully."
+        );
+        response.setRefreshToken(newRefreshToken.getToken());
+
+        return response;
+    }
+
+    @Override
+    public void logout(String refreshToken) {
+        if (refreshToken != null && !refreshToken.trim().isEmpty()) {
+            refreshTokenService.revokeToken(refreshToken.trim());
+        }
     }
 
     @Override

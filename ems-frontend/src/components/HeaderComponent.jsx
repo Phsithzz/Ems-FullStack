@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getAuthUser, logout } from "../services/AuthService";
+import { getAuthUser, logoutApi } from "../services/AuthService";
 import { Link, useNavigate } from "react-router-dom";
 
 const HeaderComponent = ({ searchQuery, setSearchQuery }) => {
@@ -10,8 +10,8 @@ const HeaderComponent = ({ searchQuery, setSearchQuery }) => {
     setCurrentUser(getAuthUser());
   }, []);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logoutApi();
     setCurrentUser(null);
     navigator("/login");
   };

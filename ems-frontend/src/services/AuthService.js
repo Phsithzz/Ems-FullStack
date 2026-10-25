@@ -1,14 +1,46 @@
 import axios from "axios";
 
+// Always allow cookies for cross-origin credentials
+axios.defaults.withCredentials = true;
+
 const AUTH_API_BASE_URL =
   import.meta.env.VITE_AUTH_API_BASE_URL || "http://localhost:8080/api/auth";
+
+// Bank-Grade Security: Access Token is strictly held IN-MEMORY to protect against XSS attacks.
+// Long-lived Refresh Token is stored by the browser in an HttpOnly, SameSite=Lax cookie.
+let inMemoryAccessToken = null;
+
+export const setAccessToken = (token) => {
+  inMemoryAccessToken = token;
+};
+
+export const getAccessToken = () => {
+  return inMemoryAccessToken;
+};
+
+export const clearAccessToken = () => {
+  inMemoryAccessToken = null;
+};
 
 export const loginApi = (email, password) => {
   return axios.post(`${AUTH_API_BASE_URL}/login`, { email, password });
 };
 
-export const verifyOtpApi = (email, otpCode) => {
-  return axios.post(`${AUTH_API_BASE_URL}/verify-otp`, { email, otpCode });
+export const verifyOtpApi = async (email, otpCode) => {
+  const response = await axios.post(
+    `${AUTH_API_BASE_URL}/verify-otp`,
+    { email, otpCode },
+    { withCredentials: true }
+  );
+
+  const { accessToken, name, role } = response.data;
+  if (accessToken) {
+    setAccessToken(accessToken);
+  }
+  // Store only non-sensitive profile metadata for UI display (NO token in localStorage)
+  localStorage.setItem("paypulse_user", JSON.stringify({ email, name, role }));
+
+  return response;
 };
 
 export const resendOtpApi = (email) => {
@@ -19,18 +51,41 @@ export const registerApi = (name, email, password, role) => {
   return axios.post(`${AUTH_API_BASE_URL}/register`, { name, email, password, role });
 };
 
-// Token Storage Utilities
-export const setAuthData = (token, email, name, role) => {
-  localStorage.setItem("binance_ems_token", token);
-  localStorage.setItem("binance_ems_user", JSON.stringify({ email, name, role }));
+export const refreshTokenApi = async () => {
+  try {
+    const response = await axios.post(
+      `${AUTH_API_BASE_URL}/refresh-token`,
+      {},
+      { withCredentials: true }
+    );
+    const { accessToken, email, name, role } = response.data;
+    if (accessToken) {
+      setAccessToken(accessToken);
+    }
+    if (email && name) {
+      localStorage.setItem("paypulse_user", JSON.stringify({ email, name, role }));
+    }
+    return response.data;
+  } catch (err) {
+    clearAccessToken();
+    localStorage.removeItem("paypulse_user");
+    throw err;
+  }
 };
 
-export const getAuthToken = () => {
-  return localStorage.getItem("binance_ems_token");
+export const logoutApi = async () => {
+  try {
+    await axios.post(`${AUTH_API_BASE_URL}/logout`, {}, { withCredentials: true });
+  } catch (e) {
+    // Ignore network error during logout
+  } finally {
+    clearAccessToken();
+    localStorage.removeItem("paypulse_user");
+  }
 };
 
 export const getAuthUser = () => {
-  const userStr = localStorage.getItem("binance_ems_user");
+  const userStr = localStorage.getItem("paypulse_user");
   if (!userStr) return null;
   try {
     return JSON.parse(userStr);
@@ -39,11 +94,6 @@ export const getAuthUser = () => {
   }
 };
 
-export const logout = () => {
-  localStorage.removeItem("binance_ems_token");
-  localStorage.removeItem("binance_ems_user");
-};
-
 export const isAuthenticated = () => {
-  return !!getAuthToken();
+  return !!inMemoryAccessToken || !!localStorage.getItem("paypulse_user");
 };

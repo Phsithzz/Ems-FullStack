@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { loginApi, verifyOtpApi, resendOtpApi, setAuthData } from "../services/AuthService";
+import { loginApi, verifyOtpApi, resendOtpApi } from "../services/AuthService";
 import { useNavigate, Link } from "react-router-dom";
 
 const LoginComponent = () => {
   const [step, setStep] = useState(1); // 1 = Login credentials, 2 = 2FA OTP
-  const [email, setEmail] = useState("admin@binance.com");
+  const [email, setEmail] = useState("admin@paypulse.io");
   const [password, setPassword] = useState("admin123");
   const [otpValues, setOtpValues] = useState(["", "", "", "", "", ""]);
   
@@ -115,11 +115,8 @@ const LoginComponent = () => {
     setErrorMessage("");
     try {
       setLoading(true);
-      const response = await verifyOtpApi(email, code);
+      await verifyOtpApi(email, code);
       setLoading(false);
-
-      const { accessToken, email: userEmail, name, role } = response.data;
-      setAuthData(accessToken, userEmail, name, role);
 
       setSuccessMessage("Authentication verified successfully! Redirecting...");
       setTimeout(() => {
@@ -163,14 +160,14 @@ const LoginComponent = () => {
         {/* Brand Logo & Header */}
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FF5C35] to-[#FF844B] flex items-center justify-center text-white font-black text-xl shadow-md shadow-orange-500/20 mx-auto mb-3">
-            B
+            P
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-            Binance<span className="text-[#FF5C35]">Pay</span> & Card
+            Pay<span className="text-[#FF5C35]">Pulse</span> Platform
           </h1>
           <p className="text-xs text-slate-400 mt-1">
             {step === 1
-              ? "Enterprise Identity & Two-Factor Authentication"
+              ? "Institutional Payroll & Corporate Cards Platform"
               : "Step 2: Two-Factor Security Verification"}
           </p>
         </div>
@@ -206,7 +203,7 @@ const LoginComponent = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@binance.com"
+                placeholder="admin@paypulse.io"
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF5C35]/20 focus:border-[#FF5C35] transition"
               />
             </div>
@@ -228,7 +225,7 @@ const LoginComponent = () => {
             {/* Default Account Hint Box */}
             <div className="p-3 bg-orange-50/60 rounded-xl border border-orange-100/70 text-[11px] text-slate-600 space-y-0.5">
               <span className="font-bold text-[#FF5C35]">Default Demo Credentials:</span>
-              <p>Email: <code className="font-semibold text-slate-800">admin@binance.com</code></p>
+              <p>Email: <code className="font-semibold text-slate-800">admin@paypulse.io</code></p>
               <p>Password: <code className="font-semibold text-slate-800">admin123</code></p>
             </div>
 

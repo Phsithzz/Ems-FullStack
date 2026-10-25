@@ -25,8 +25,13 @@ public class JwtTokenProvider {
     @Value("${jwt.secret:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}")
     private String jwtSecret;
 
-    @Value("${jwt.expiration-ms:86400000}")
+    // Short-lived Access Token: 15 minutes (900,000 ms) in accordance with bank-grade security standards
+    @Value("${jwt.expiration-ms:900000}")
     private long jwtExpirationDate;
+
+    public long getExpirationMs() {
+        return jwtExpirationDate;
+    }
 
     // Generate Key
     private Key key() {
