@@ -12,6 +12,10 @@
 
 Designed following global core-banking and payment gateway standards (Stripe, Adyen, Revolut, Rippling), WorkPay guarantees **zero-double spending**, **deadlock-free pessimistic locking**, **T+0 automated financial reconciliation**, and **bank-grade in-memory session security**.
 
+<p align="center">
+  <img src="docs/screenshots/project-ems.png" alt="WorkPay Enterprise Fintech Platform Overview" width="100%" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);" />
+</p>
+
 ---
 
 ## 🏛️ System Architecture
