@@ -50,11 +50,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        // Public Authentication APIs
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Public employee read / operations (for seamless demo and testing)
-                        .requestMatchers("/api/employees/**").permitAll()
+                        // Public APIs for seamless demo and testing
+                        .requestMatchers("/api/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

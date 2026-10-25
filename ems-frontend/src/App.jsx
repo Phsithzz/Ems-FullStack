@@ -6,6 +6,9 @@ import HeaderComponent from "./components/HeaderComponent";
 import SidebarComponent from "./components/SidebarComponent";
 import ListEmployeeComponent from "./components/ListEmployeeComponent";
 import LoginComponent from "./components/LoginComponent";
+import PaymentComponent from "./components/PaymentComponent";
+import CardManagementComponent from "./components/CardManagementComponent";
+import LedgerComponent from "./components/LedgerComponent";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 const AppContent = () => {
@@ -46,6 +49,9 @@ const AppContent = () => {
             />
             <Route path="/add-employee" element={<EmployeeComponent />} />
             <Route path="/edit-employee/:id" element={<EmployeeComponent />} />
+            <Route path="/payroll" element={<PaymentComponent />} />
+            <Route path="/cards" element={<CardManagementComponent />} />
+            <Route path="/ledger" element={<LedgerComponent />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
