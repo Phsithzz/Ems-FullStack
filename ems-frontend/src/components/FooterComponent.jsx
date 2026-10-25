@@ -2,9 +2,12 @@ import React from "react";
 
 const FooterComponent = () => {
   return (
-    <footer className="bg-slate-900 border-t border-slate-800 py-4 text-center text-slate-400 text-sm">
-      <div className="max-w-7xl mx-auto px-4">
-        <span>All rights reserved 2026 by phoosith</span>
+    <footer className="py-4 px-8 border-t border-slate-100 bg-white text-center text-xs text-slate-400">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-2 max-w-7xl mx-auto">
+        <span>© 2026 Binance Pay & Card — Enterprise EMS Showcase</span>
+        <span className="font-medium text-slate-500">
+          Built with Spring Boot & React by Phoosith
+        </span>
       </div>
     </footer>
   );

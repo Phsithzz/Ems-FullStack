@@ -1,29 +1,65 @@
+import React, { useState } from "react";
 import "./App.css";
 import EmployeeComponent from "./components/EmployeeComponent";
 import FooterComponent from "./components/FooterComponent";
 import HeaderComponent from "./components/HeaderComponent";
+import SidebarComponent from "./components/SidebarComponent";
 import ListEmployeeComponent from "./components/ListEmployeeComponent";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LoginComponent from "./components/LoginComponent";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+
+const AppContent = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const location = useLocation();
+  const isAuthPage = location.pathname === "/login";
+
+  if (isAuthPage) {
+    return (
+      <Routes>
+        <Route path="/login" element={<LoginComponent />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex bg-[#F8F9FB] text-slate-800 antialiased font-sans">
+      {/* Left Sidebar (Matching Dribbble layout) */}
+      <SidebarComponent />
+
+      {/* Right Main Content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <HeaderComponent
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
+
+        <main className="flex-1 px-8 py-7 overflow-y-auto">
+          <Routes>
+            <Route
+              path="/"
+              element={<ListEmployeeComponent searchQuery={searchQuery} />}
+            />
+            <Route
+              path="/employees"
+              element={<ListEmployeeComponent searchQuery={searchQuery} />}
+            />
+            <Route path="/add-employee" element={<EmployeeComponent />} />
+            <Route path="/edit-employee/:id" element={<EmployeeComponent />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+
+        <FooterComponent />
+      </div>
+    </div>
+  );
+};
 
 const App = () => {
   return (
     <BrowserRouter>
-      <div className="min-h-screen flex flex-col justify-between bg-slate-50 text-slate-800">
-        <HeaderComponent />
-        <main className="flex-grow py-8 px-4 sm:px-6 lg:px-8 max-w-7xl w-full mx-auto">
-          <Routes>
-            {/* http://localhost:3000 */}
-            <Route path="/" element={<ListEmployeeComponent />} />
-            {/* http://localhost:3000/employees */}
-            <Route path="/employees" element={<ListEmployeeComponent />} />
-            {/* http://localhost:3000/add-employee */}
-            <Route path="/add-employee" element={<EmployeeComponent />} />
-            {/* http://localhost:3000/edit-employee/1 */}
-            <Route path="/edit-employee/:id" element={<EmployeeComponent />} />
-          </Routes>
-        </main>
-        <FooterComponent />
-      </div>
+      <AppContent />
     </BrowserRouter>
   );
 };
