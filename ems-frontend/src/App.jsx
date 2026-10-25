@@ -53,6 +53,10 @@ const AppContent = () => {
               element={<ListEmployeeComponent searchQuery={searchQuery} />}
             />
             <Route
+              path="/dashboard"
+              element={<ListEmployeeComponent searchQuery={searchQuery} />}
+            />
+            <Route
               path="/employees"
               element={<ListEmployeeComponent searchQuery={searchQuery} />}
             />
