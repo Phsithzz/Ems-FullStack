@@ -1,9 +1,11 @@
 import React from "react";
 import { useAuthStore } from "../store/useAuthStore";
+import { useUIStore } from "../store/useUIStore";
 import { Link, useNavigate } from "react-router-dom";
 
 const HeaderComponent = ({ searchQuery, setSearchQuery }) => {
   const { user: currentUser, logout } = useAuthStore();
+  const { isSidebarCollapsed, toggleSidebar } = useUIStore();
   const navigator = useNavigate();
 
   const handleLogout = async () => {
@@ -13,20 +15,34 @@ const HeaderComponent = ({ searchQuery, setSearchQuery }) => {
 
   return (
     <header className="h-20 bg-white border-b border-slate-100 flex items-center justify-between px-8">
-      {/* Search Bar */}
-      <div className="relative w-80">
-        <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      {/* Left: Sidebar Toggle & Search Bar */}
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          className="p-2 rounded-xl text-slate-500 hover:text-indigo-600 hover:bg-slate-100 transition-colors cursor-pointer"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" />
           </svg>
-        </span>
-        <input
-          type="text"
-          value={searchQuery || ""}
-          onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
-          placeholder="Search employee by name, email..."
-          className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#FF5C35]/20 focus:border-[#FF5C35] transition"
-        />
+        </button>
+
+        {/* Search Bar */}
+        <div className="relative w-64 md:w-80">
+          <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+          <input
+            type="text"
+            value={searchQuery || ""}
+            onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
+            placeholder="Search employee by name, email..."
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]/20 focus:border-[#4F46E5] transition"
+          />
+        </div>
       </div>
 
       {/* Right Action Icons & Auth Profile */}
@@ -42,7 +58,7 @@ const HeaderComponent = ({ searchQuery, setSearchQuery }) => {
           <div className="flex items-center gap-3 pl-3 border-l border-slate-100">
             <div className="text-right hidden sm:block">
               <p className="text-xs font-bold text-slate-800 leading-none">{currentUser.name}</p>
-              <span className="text-[10px] font-semibold text-[#FF5C35] uppercase tracking-wider">
+              <span className="text-[10px] font-semibold text-indigo-600 uppercase tracking-wider">
                 {currentUser.role?.replace("ROLE_", "")}
               </span>
             </div>
