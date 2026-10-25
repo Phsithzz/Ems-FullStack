@@ -35,3 +35,12 @@ export const settleCard = (txnId) =>
 export const getLedgerJournals = () => apiClient.get("/ledger/journals");
 
 export const getLedgerAudit = () => apiClient.get("/ledger/audit");
+
+// Phase 5 & 6 APIs: Kafka Streaming, Reconciliation & Observability
+export const getReconciliationReports = () => apiClient.get("/reconciliation/reports");
+
+export const runBatchReconciliation = () => apiClient.post("/reconciliation/run");
+
+export const getKafkaLiveEvents = () => apiClient.get("/reconciliation/events");
+
+export const getSystemMetrics = () => apiClient.get("/reconciliation/metrics");

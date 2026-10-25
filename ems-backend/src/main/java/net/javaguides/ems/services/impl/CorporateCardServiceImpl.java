@@ -2,14 +2,17 @@ package net.javaguides.ems.services.impl;
 
 import net.javaguides.ems.dto.*;
 import net.javaguides.ems.entity.*;
+import net.javaguides.ems.event.CardEvent;
 import net.javaguides.ems.exception.CardOperationException;
 import net.javaguides.ems.exception.ResourceNotFoundException;
 import net.javaguides.ems.repository.*;
 import net.javaguides.ems.services.CorporateCardService;
+import net.javaguides.ems.services.EventProducerService;
 import net.javaguides.ems.services.IdempotencyService;
 import net.javaguides.ems.services.LedgerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +37,9 @@ public class CorporateCardServiceImpl implements CorporateCardService {
     private final PasswordEncoder passwordEncoder;
     private final LedgerService ledgerService;
     private final IdempotencyService idempotencyService;
+
+    @Autowired(required = false)
+    private EventProducerService eventProducerService;
 
     public CorporateCardServiceImpl(
             CorporateCardRepository corporateCardRepository,
@@ -191,6 +197,24 @@ public class CorporateCardServiceImpl implements CorporateCardService {
         CardTransaction savedTxn = cardTransactionRepository.save(txn);
         log.info("✅ [CARD AUTH APPROVED] Card: {} | Merchant: {} | Amount: {} | Code: {}",
                 card.getCardNumber(), dto.getMerchantName(), amount, authCode);
+
+        // Publish Asynchronous Kafka Event (Phase 5)
+        if (eventProducerService != null) {
+            eventProducerService.publishCardEvent(
+                    CardEvent.builder()
+                            .eventId(UUID.randomUUID().toString())
+                            .eventType("CARD_AUTHORIZED")
+                            .cardId(card.getId())
+                            .cardNumber(card.getCardNumber())
+                            .merchantName(dto.getMerchantName())
+                            .amount(amount)
+                            .currency(txn.getCurrency())
+                            .status("AUTHORIZED")
+                            .authCode(authCode)
+                            .timestamp(savedTxn.getCreatedAt())
+                            .build()
+            );
+        }
 
         return CardAuthorizeResponseDto.builder()
                 .transactionId(savedTxn.getId())

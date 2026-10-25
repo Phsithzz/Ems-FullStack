@@ -5,15 +5,18 @@ import net.javaguides.ems.dto.TransferRequestDto;
 import net.javaguides.ems.dto.WalletDto;
 import net.javaguides.ems.entity.PaymentTransaction;
 import net.javaguides.ems.entity.Wallet;
+import net.javaguides.ems.event.PaymentEvent;
 import net.javaguides.ems.exception.InsufficientFundsException;
 import net.javaguides.ems.exception.ResourceNotFoundException;
 import net.javaguides.ems.repository.PaymentTransactionRepository;
 import net.javaguides.ems.repository.WalletRepository;
+import net.javaguides.ems.services.EventProducerService;
 import net.javaguides.ems.services.IdempotencyService;
 import net.javaguides.ems.services.LedgerService;
 import net.javaguides.ems.services.WalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +37,9 @@ public class WalletServiceImpl implements WalletService {
     private final PaymentTransactionRepository paymentTransactionRepository;
     private final LedgerService ledgerService;
     private final IdempotencyService idempotencyService;
+
+    @Autowired(required = false)
+    private EventProducerService eventProducerService;
 
     public WalletServiceImpl(
             WalletRepository walletRepository,
@@ -149,6 +155,23 @@ public class WalletServiceImpl implements WalletService {
 
         log.info("💸 [TRANSFER SUCCESS] Ref: {} | From: {} -> To: {} | Amount: {} {}",
                 txnRef, sourceWallet.getAccountNumber(), targetWallet.getAccountNumber(), amount, sourceWallet.getCurrency());
+
+        // Publish Asynchronous Kafka Event (Phase 5)
+        if (eventProducerService != null) {
+            eventProducerService.publishPaymentEvent(
+                    PaymentEvent.builder()
+                            .eventId(UUID.randomUUID().toString())
+                            .eventType("PAYMENT_TRANSFERRED")
+                            .transactionReference(savedTxn.getTransactionReference())
+                            .sourceWallet(sourceWallet.getWalletName())
+                            .targetWallet(targetWallet.getWalletName())
+                            .amount(savedTxn.getAmount())
+                            .currency(savedTxn.getCurrency())
+                            .status(savedTxn.getStatus())
+                            .timestamp(savedTxn.getCreatedAt())
+                            .build()
+            );
+        }
 
         return PaymentResponseDto.builder()
                 .transactionReference(savedTxn.getTransactionReference())

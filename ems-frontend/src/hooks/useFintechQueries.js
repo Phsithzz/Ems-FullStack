@@ -10,6 +10,10 @@ import {
   getLedgerJournals,
   getLedgerAudit,
   transferFunds,
+  getReconciliationReports,
+  runBatchReconciliation,
+  getKafkaLiveEvents,
+  getSystemMetrics,
 } from "../services/FintechService";
 
 export const FINTECH_QUERY_KEYS = {
@@ -18,6 +22,9 @@ export const FINTECH_QUERY_KEYS = {
   cards: ["cards"],
   ledgerJournals: ["ledger-journals"],
   ledgerAudit: ["ledger-audit"],
+  reconciliationReports: ["reconciliation-reports"],
+  kafkaEvents: ["kafka-events"],
+  systemMetrics: ["system-metrics"],
 };
 
 export const useWallets = () => {
@@ -115,6 +122,51 @@ export const useCreateCardMutation = () => {
     mutationFn: (data) => createCard(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: FINTECH_QUERY_KEYS.cards });
+    },
+  });
+};
+
+export const useReconciliationReports = () => {
+  return useQuery({
+    queryKey: FINTECH_QUERY_KEYS.reconciliationReports,
+    queryFn: async () => {
+      const res = await getReconciliationReports();
+      return res.data || [];
+    },
+  });
+};
+
+export const useKafkaLiveEvents = () => {
+  return useQuery({
+    queryKey: FINTECH_QUERY_KEYS.kafkaEvents,
+    queryFn: async () => {
+      const res = await getKafkaLiveEvents();
+      return res.data || [];
+    },
+    refetchInterval: 3000, // live stream poll every 3 seconds
+  });
+};
+
+export const useSystemMetrics = () => {
+  return useQuery({
+    queryKey: FINTECH_QUERY_KEYS.systemMetrics,
+    queryFn: async () => {
+      const res = await getSystemMetrics();
+      return res.data || null;
+    },
+    refetchInterval: 5000,
+  });
+};
+
+export const useRunReconciliationMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => runBatchReconciliation(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: FINTECH_QUERY_KEYS.reconciliationReports });
+      queryClient.invalidateQueries({ queryKey: FINTECH_QUERY_KEYS.systemMetrics });
+      queryClient.invalidateQueries({ queryKey: FINTECH_QUERY_KEYS.ledgerAudit });
     },
   });
 };

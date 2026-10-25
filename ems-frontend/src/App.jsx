@@ -9,6 +9,7 @@ import LoginComponent from "./components/LoginComponent";
 import PaymentComponent from "./components/PaymentComponent";
 import CardManagementComponent from "./components/CardManagementComponent";
 import LedgerComponent from "./components/LedgerComponent";
+import ReconciliationComponent from "./components/ReconciliationComponent";
 import { refreshTokenApi } from "./services/AuthService";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
@@ -60,6 +61,7 @@ const AppContent = () => {
             <Route path="/payroll" element={<PaymentComponent />} />
             <Route path="/cards" element={<CardManagementComponent />} />
             <Route path="/ledger" element={<LedgerComponent />} />
+            <Route path="/reconciliation" element={<ReconciliationComponent />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
