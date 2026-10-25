@@ -48,13 +48,13 @@ public class EmailServiceImpl implements EmailService {
                     + "<span style='margin-left: 12px; font-size: 18px; font-weight: bold; color: #1e293b;'>Work<span style='color: #4F46E5;'>Pay</span> Platform</span>"
                     + "</div>"
                     + "<h2 style='color: #0f172a; margin-top: 0;'>Two-Factor Verification Code</h2>"
-                    + "<p style='color: #64748b; font-size: 14px;'>You requested a secure login or transaction authentication for your PayPulse account.</p>"
-                    + "<div style='background-color: #FFF4EE; border: 1px dashed #FF844B; border-radius: 12px; padding: 18px; text-align: center; margin: 24px 0;'>"
-                    + "<span style='font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #FF5C35;'>" + otpCode + "</span>"
+                    + "<p style='color: #64748b; font-size: 14px;'>You requested a secure login or transaction authentication for your WorkPay account.</p>"
+                    + "<div style='background-color: #EEF2FF; border: 1px dashed #6366F1; border-radius: 12px; padding: 18px; text-align: center; margin: 24px 0;'>"
+                    + "<span style='font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #4F46E5;'>" + otpCode + "</span>"
                     + "</div>"
                     + "<p style='color: #64748b; font-size: 13px;'>This code is valid for <strong>5 minutes</strong>. If you did not make this request, please change your password immediately.</p>"
                     + "<hr style='border: none; border-top: 1px solid #f1f5f9; margin: 24px 0;' />"
-                    + "<p style='color: #94a3b8; font-size: 11px; text-align: center;'>© 2026 PayPulse Platform • Enterprise Security</p>"
+                    + "<p style='color: #94a3b8; font-size: 11px; text-align: center;'>© 2026 WorkPay Platform • Enterprise Security</p>"
                     + "</div>";
 
             helper.setText(htmlContent, true);
