@@ -120,7 +120,7 @@ const ReconciliationComponent = () => {
           </div>
           <div className="text-base font-extrabold text-slate-900">Docker KRaft Broker</div>
           <div className="text-xs text-slate-500 mt-1 font-mono">localhost:9092 • 2 Topics</div>
-          <div className="text-[11px] text-slate-400 mt-2">paypulse.payment / paypulse.card</div>
+          <div className="text-[11px] text-slate-400 mt-2">workpay.payment / workpay.card</div>
         </div>
 
         {/* Redis Node */}

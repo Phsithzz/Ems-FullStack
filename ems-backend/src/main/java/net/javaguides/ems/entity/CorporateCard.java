@@ -47,7 +47,7 @@ public class CorporateCard {
     private String cvvHash;
 
     @Column(name = "card_type", nullable = false, length = 32)
-    private String cardType; // "PAYPULSE_BLACK_VIRTUAL", "PAYPULSE_PLATINUM_DEBIT"
+    private String cardType; // "WORKPAY_BLACK_VIRTUAL", "WORKPAY_PLATINUM_DEBIT"
 
     @Column(name = "card_status", nullable = false, length = 20)
     private String cardStatus = "ACTIVE"; // "ACTIVE", "FROZEN", "TERMINATED"

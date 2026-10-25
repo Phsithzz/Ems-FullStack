@@ -27,7 +27,7 @@ public class PaymentEventListener {
         this.objectMapper = objectMapper;
     }
 
-    @KafkaListener(topics = "paypulse.payment.events", groupId = "paypulse-consumer-group")
+    @KafkaListener(topics = "workpay.payment.events", groupId = "workpay-consumer-group")
     public void consumePaymentEvent(String message) {
         try {
             PaymentEvent event = objectMapper.readValue(message, PaymentEvent.class);
@@ -40,7 +40,7 @@ public class PaymentEventListener {
         }
     }
 
-    @KafkaListener(topics = "paypulse.card.events", groupId = "paypulse-consumer-group")
+    @KafkaListener(topics = "workpay.card.events", groupId = "workpay-consumer-group")
     public void consumeCardEvent(String message) {
         try {
             CardEvent event = objectMapper.readValue(message, CardEvent.class);

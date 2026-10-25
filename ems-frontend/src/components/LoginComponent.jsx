@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 const LoginComponent = () => {
   const [step, setStep] = useState(1); // 1 = Login credentials, 2 = 2FA OTP
-  const [email, setEmail] = useState("admin@paypulse.io");
+  const [email, setEmail] = useState("admin@workpay.io");
   const [password, setPassword] = useState("admin123");
   const [otpValues, setOtpValues] = useState(["", "", "", "", "", ""]);
   
@@ -212,7 +212,7 @@ const LoginComponent = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@paypulse.io"
+                placeholder="admin@workpay.io"
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FF5C35]/20 focus:border-[#FF5C35] transition"
               />
             </div>
@@ -234,7 +234,7 @@ const LoginComponent = () => {
             {/* Default Account Hint Box */}
             <div className="p-3 bg-orange-50/60 rounded-xl border border-orange-100/70 text-[11px] text-slate-600 space-y-0.5">
               <span className="font-bold text-[#FF5C35]">Default Demo Credentials:</span>
-              <p>Email: <code className="font-semibold text-slate-800">admin@paypulse.io</code></p>
+              <p>Email: <code className="font-semibold text-slate-800">admin@workpay.io</code></p>
               <p>Password: <code className="font-semibold text-slate-800">admin123</code></p>
             </div>
 

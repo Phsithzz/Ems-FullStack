@@ -15,8 +15,8 @@ public class EventProducerServiceImpl implements EventProducerService {
 
     private static final Logger log = LoggerFactory.getLogger(EventProducerServiceImpl.class);
 
-    public static final String PAYMENT_EVENTS_TOPIC = "paypulse.payment.events";
-    public static final String CARD_EVENTS_TOPIC = "paypulse.card.events";
+    public static final String PAYMENT_EVENTS_TOPIC = "workpay.payment.events";
+    public static final String CARD_EVENTS_TOPIC = "workpay.card.events";
 
     @Autowired(required = false)
     private KafkaTemplate<String, String> kafkaTemplate;

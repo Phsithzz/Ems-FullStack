@@ -3,7 +3,7 @@ version: '3.8'
 services:
   redis:
     image: redis:7-alpine
-    container_name: paypulse-redis
+    container_name: workpay-redis
     ports:
       - "6379:6379"
     restart: unless-stopped
@@ -11,7 +11,7 @@ services:
 
   kafka:
     image: apache/kafka:3.7.0
-    container_name: paypulse-kafka
+    container_name: workpay-kafka
     ports:
       - "9092:9092"
     environment:

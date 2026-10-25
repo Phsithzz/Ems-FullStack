@@ -38,7 +38,7 @@ export const verifyOtpApi = async (email, otpCode) => {
     setAccessToken(accessToken);
   }
   // Store only non-sensitive profile metadata for UI display (NO token in localStorage)
-  localStorage.setItem("paypulse_user", JSON.stringify({ email, name, role }));
+  localStorage.setItem("workpay_user", JSON.stringify({ email, name, role }));
 
   return response;
 };
@@ -63,12 +63,12 @@ export const refreshTokenApi = async () => {
       setAccessToken(accessToken);
     }
     if (email && name) {
-      localStorage.setItem("paypulse_user", JSON.stringify({ email, name, role }));
+      localStorage.setItem("workpay_user", JSON.stringify({ email, name, role }));
     }
     return response.data;
   } catch (err) {
     clearAccessToken();
-    localStorage.removeItem("paypulse_user");
+    localStorage.removeItem("workpay_user");
     throw err;
   }
 };
@@ -80,12 +80,12 @@ export const logoutApi = async () => {
     // Ignore network error during logout
   } finally {
     clearAccessToken();
-    localStorage.removeItem("paypulse_user");
+    localStorage.removeItem("workpay_user");
   }
 };
 
 export const getAuthUser = () => {
-  const userStr = localStorage.getItem("paypulse_user");
+  const userStr = localStorage.getItem("workpay_user");
   if (!userStr) return null;
   try {
     return JSON.parse(userStr);
@@ -95,5 +95,5 @@ export const getAuthUser = () => {
 };
 
 export const isAuthenticated = () => {
-  return !!inMemoryAccessToken || !!localStorage.getItem("paypulse_user");
+  return !!inMemoryAccessToken || !!localStorage.getItem("workpay_user");
 };

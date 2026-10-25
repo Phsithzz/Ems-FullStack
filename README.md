@@ -1,4 +1,4 @@
-# PayPulse Enterprise Fintech & Corporate Card Platform
+# WorkPay Enterprise Fintech & Corporate Card Platform
 
 [![Spring Boot 4.x](https://img.shields.io/badge/Spring%20Boot-4.1.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![React 19](https://img.shields.io/badge/React-19.0.0-blue.svg)](https://react.dev/)
@@ -8,9 +8,9 @@
 [![Docker](https://img.shields.io/badge/Docker-Desktop%20Enabled-2496ed.svg)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**PayPulse** is an enterprise-grade fintech platform engineered for high-concurrency payment processing, virtual corporate card issuing, mathematical double-entry bookkeeping, and real-time Kafka event streaming. 
+**WorkPay** is an enterprise-grade fintech platform engineered for high-concurrency workforce payment processing, virtual corporate card issuing, mathematical double-entry bookkeeping, and real-time Kafka event streaming. 
 
-Designed following global core-banking and payment gateway standards (Stripe, Adyen, Revolut), PayPulse guarantees **zero-double spending**, **deadlock-free pessimistic locking**, **T+0 automated financial reconciliation**, and **bank-grade in-memory session security**.
+Designed following global core-banking and payment gateway standards (Stripe, Adyen, Revolut, Rippling), WorkPay guarantees **zero-double spending**, **deadlock-free pessimistic locking**, **T+0 automated financial reconciliation**, and **bank-grade in-memory session security**.
 
 ---
 
@@ -32,7 +32,7 @@ flowchart TD
         RTR["Refresh Token Rotation (RTR) Engine"]
     end
 
-    subgraph CoreEngine ["PayPulse Core Financial Engine"]
+    subgraph CoreEngine ["WorkPay Core Financial Engine"]
         Idempotency["Idempotency Guard<br/>(Redis & In-Memory Deduplication)"]
         WalletEngine["Wallet Engine<br/>(Deterministic Ascending Pessimistic Row Lock)"]
         CardEngine["Corporate Card Engine<br/>(Dual-Message Auth Hold & Settle)"]
@@ -42,14 +42,14 @@ flowchart TD
 
     subgraph EventStreaming ["Event-Driven Streaming (Docker KRaft)"]
         KafkaProducer["EventProducerService"]
-        PaymentTopic["paypulse.payment.events"]
-        CardTopic["paypulse.card.events"]
+        PaymentTopic["workpay.payment.events"]
+        CardTopic["workpay.card.events"]
         KafkaConsumer["PaymentEventListener (Circular Buffer Live Feed)"]
     end
 
     subgraph Persistence ["Containerized Data Tier"]
-        DockerKafka["paypulse-kafka (port 9092)"]
-        DockerRedis["paypulse-redis (port 6379)"]
+        DockerKafka["workpay-kafka (port 9092)"]
+        DockerRedis["workpay-redis (port 6379)"]
         MySQL[("MySQL 8.0 ACID Database")]
     end
 
@@ -91,7 +91,7 @@ flowchart TD
 
 ### 4. Apache Kafka KRaft Event Streaming
 - Runs **Apache Kafka 3.7.0** in modern KRaft mode (no ZooKeeper required) on Docker port `9092`.
-- Asynchronously publishes payment and card events across partitioned topics (`paypulse.payment.events`, `paypulse.card.events`).
+- Asynchronously publishes payment and card events across partitioned topics (`workpay.payment.events`, `workpay.card.events`).
 - Frontend features a real-time event streaming visualizer with 3-second live polling and partition message payload inspection.
 
 ### 5. Bank-Grade Token Management (No LocalStorage)
@@ -135,7 +135,7 @@ docker compose up -d
 Verify containers are running:
 ```bash
 docker ps
-# Expected: paypulse-kafka (port 9092) and paypulse-redis (port 6379)
+# Expected: workpay-kafka (port 9092) and workpay-redis (port 6379)
 ```
 
 ### 2. Configure & Start Backend
@@ -169,11 +169,11 @@ The system automatically seeds an administrator, compensation wallets, and corpo
 
 | Role / Wallet | Account / Email | Password | Initial Balance |
 |---|---|---|---|
-| **System Admin** | `admin@paypulse.io` | `admin123` | N/A |
+| **System Admin** | `admin@workpay.io` | `admin123` | N/A |
 | **Corporate Treasury** | `WAL-MAIN-TREASURY` | N/A | $1,000,000.00 USDT |
 | **Operations Payroll** | `WAL-OPS-PAYROLL` | N/A | $250,000.00 USDT |
-| **Alice Smith (Employee)** | `alice.smith@paypulse.io` | N/A | $6,500.00 USDT |
-| **Bob Jones (Employee)** | `bob.jones@paypulse.io` | N/A | $8,200.00 USDT |
+| **Alice Smith (Employee)** | `alice.smith@workpay.io` | N/A | $6,500.00 USDT |
+| **Bob Jones (Employee)** | `bob.jones@workpay.io` | N/A | $8,200.00 USDT |
 
 ---
 
@@ -200,7 +200,7 @@ The system automatically seeds an administrator, compensation wallets, and corpo
 
 ## 🧪 Testing & Verification
 
-PayPulse includes unit, concurrency, and integration tests covering card authorization, double-entry mathematical invariants, and wallet transfers:
+WorkPay includes unit, concurrency, and integration tests covering card authorization, double-entry mathematical invariants, and wallet transfers:
 
 ```bash
 cd ems-backend

@@ -35,7 +35,7 @@ const CardManagementComponent = () => {
   const [issueEmployeeId, setIssueEmployeeId] = useState("");
   const [issueWalletId, setIssueWalletId] = useState("");
   const [cardHolderName, setCardHolderName] = useState("");
-  const [cardType, setCardType] = useState("PAYPULSE_BLACK_VIRTUAL");
+  const [cardType, setCardType] = useState("WORKPAY_BLACK_VIRTUAL");
   const [dailyLimit, setDailyLimit] = useState("5000.00");
 
   useEffect(() => {
@@ -120,8 +120,8 @@ const CardManagementComponent = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-zinc-900 to-black p-6 md:p-8 rounded-2xl text-white shadow-xl border border-slate-800">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              PayPulse Corporate Cards
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+              WorkPay Corporate Cards
             </span>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/30">
               Virtual Visa/Mastercard Emulation
@@ -183,8 +183,8 @@ const CardManagementComponent = () => {
                   >
                     {card.cardStatus}
                   </span>
-                  <span className="font-extrabold text-xs tracking-wider text-amber-400">
-                    PAYPULSE
+                  <span className="font-extrabold text-xs tracking-wider text-indigo-400">
+                    WORKPAY
                   </span>
                 </div>
               </div>
@@ -402,8 +402,8 @@ const CardManagementComponent = () => {
                   onChange={(e) => setCardType(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                 >
-                  <option value="PAYPULSE_BLACK_VIRTUAL">PayPulse Black Virtual (Tier 1)</option>
-                  <option value="PAYPULSE_PLATINUM_DEBIT">PayPulse Platinum Corporate (Tier 2)</option>
+                  <option value="WORKPAY_BLACK_VIRTUAL">WorkPay Black Virtual (Tier 1)</option>
+                  <option value="WORKPAY_PLATINUM_DEBIT">WorkPay Platinum Corporate (Tier 2)</option>
                 </select>
               </div>
 

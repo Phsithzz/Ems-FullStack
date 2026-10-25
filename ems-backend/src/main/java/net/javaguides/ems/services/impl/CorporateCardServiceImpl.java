@@ -103,7 +103,7 @@ public class CorporateCardServiceImpl implements CorporateCardService {
         card.setExpiryMonth(expiryMonth);
         card.setExpiryYear(expiryYear);
         card.setCvvHash(passwordEncoder.encode(String.valueOf(100 + random.nextInt(900))));
-        card.setCardType(dto.getCardType() != null ? dto.getCardType() : "PAYPULSE_BLACK_VIRTUAL");
+        card.setCardType(dto.getCardType() != null ? dto.getCardType() : "WORKPAY_BLACK_VIRTUAL");
         card.setCardStatus("ACTIVE");
         card.setDailyLimit(dto.getDailyLimit() != null ? dto.getDailyLimit() : new BigDecimal("5000.00"));
         card.setDailySpent(BigDecimal.ZERO);

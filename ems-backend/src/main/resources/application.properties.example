@@ -1,9 +1,9 @@
 # ===================================================================
-# PayPulse Platform - Configuration Template
+# WorkPay Platform - Configuration Template
 # Copy this file to application.properties and fill in your credentials
 # ===================================================================
 
-spring.application.name=paypulse-backend
+spring.application.name=workpay-backend
 
 # -------------------------------------------------------------------
 # Database Configuration (MySQL)
@@ -25,7 +25,7 @@ spring.data.redis.port=6379
 
 # Apache Kafka Event Streaming (KRaft Mode)
 spring.kafka.bootstrap-servers=localhost:9092
-spring.kafka.consumer.group-id=paypulse-core-group
+spring.kafka.consumer.group-id=workpay-core-group
 spring.kafka.consumer.auto-offset-reset=earliest
 
 # -------------------------------------------------------------------

@@ -54,7 +54,7 @@ const PaymentComponent = () => {
       targetWalletId: parseInt(targetWalletId),
       amount: parseFloat(amount),
       currency: "USDT",
-      description: description || "PayPulse Instant Transfer",
+      description: description || "WorkPay Instant Transfer",
     };
 
     transferMutation.mutate(
@@ -84,11 +84,11 @@ const PaymentComponent = () => {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Top Banner / Hero */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-800 to-amber-950/70 p-6 md:p-8 rounded-2xl text-white shadow-xl border border-amber-500/20">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950/70 p-6 md:p-8 rounded-2xl text-white shadow-xl border border-indigo-500/20">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              PayPulse Core Engine
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+              WorkPay Core Engine
             </span>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
               Pessimistic Row Lock & Idempotent
