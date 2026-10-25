@@ -18,8 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -37,9 +39,25 @@ public class WalletServiceImpl implements WalletService {
     private final PaymentTransactionRepository paymentTransactionRepository;
     private final LedgerService ledgerService;
     private final IdempotencyService idempotencyService;
+    private final TransactionTemplate transactionTemplate;
 
     @Autowired(required = false)
     private EventProducerService eventProducerService;
+
+    @Autowired
+    public WalletServiceImpl(
+            WalletRepository walletRepository,
+            PaymentTransactionRepository paymentTransactionRepository,
+            LedgerService ledgerService,
+            IdempotencyService idempotencyService,
+            PlatformTransactionManager transactionManager
+    ) {
+        this.walletRepository = walletRepository;
+        this.paymentTransactionRepository = paymentTransactionRepository;
+        this.ledgerService = ledgerService;
+        this.idempotencyService = idempotencyService;
+        this.transactionTemplate = transactionManager != null ? new TransactionTemplate(transactionManager) : null;
+    }
 
     public WalletServiceImpl(
             WalletRepository walletRepository,
@@ -47,10 +65,7 @@ public class WalletServiceImpl implements WalletService {
             LedgerService ledgerService,
             IdempotencyService idempotencyService
     ) {
-        this.walletRepository = walletRepository;
-        this.paymentTransactionRepository = paymentTransactionRepository;
-        this.ledgerService = ledgerService;
-        this.idempotencyService = idempotencyService;
+        this(walletRepository, paymentTransactionRepository, ledgerService, idempotencyService, null);
     }
 
     @Override
@@ -69,12 +84,14 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public PaymentResponseDto transferFunds(TransferRequestDto request, String idempotencyKey) {
-        // Enforce Idempotency Key protection
+        // Enforce Idempotency Key protection with explicit programmatic transaction
         return idempotencyService.execute(
                 idempotencyKey,
                 "/api/wallets/transfer",
                 PaymentResponseDto.class,
-                () -> executeTransferUnderLock(request, idempotencyKey)
+                () -> transactionTemplate != null
+                        ? transactionTemplate.execute(status -> executeTransferUnderLock(request, idempotencyKey))
+                        : executeTransferUnderLock(request, idempotencyKey)
         );
     }
 

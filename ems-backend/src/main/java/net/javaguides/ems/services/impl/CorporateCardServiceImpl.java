@@ -15,7 +15,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 import java.security.SecureRandom;
@@ -37,9 +39,31 @@ public class CorporateCardServiceImpl implements CorporateCardService {
     private final PasswordEncoder passwordEncoder;
     private final LedgerService ledgerService;
     private final IdempotencyService idempotencyService;
+    private final TransactionTemplate transactionTemplate;
 
     @Autowired(required = false)
     private EventProducerService eventProducerService;
+
+    @Autowired
+    public CorporateCardServiceImpl(
+            CorporateCardRepository corporateCardRepository,
+            CardTransactionRepository cardTransactionRepository,
+            WalletRepository walletRepository,
+            EmployeeRepository employeeRepository,
+            PasswordEncoder passwordEncoder,
+            LedgerService ledgerService,
+            IdempotencyService idempotencyService,
+            PlatformTransactionManager transactionManager
+    ) {
+        this.corporateCardRepository = corporateCardRepository;
+        this.cardTransactionRepository = cardTransactionRepository;
+        this.walletRepository = walletRepository;
+        this.employeeRepository = employeeRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.ledgerService = ledgerService;
+        this.idempotencyService = idempotencyService;
+        this.transactionTemplate = transactionManager != null ? new TransactionTemplate(transactionManager) : null;
+    }
 
     public CorporateCardServiceImpl(
             CorporateCardRepository corporateCardRepository,
@@ -50,13 +74,7 @@ public class CorporateCardServiceImpl implements CorporateCardService {
             LedgerService ledgerService,
             IdempotencyService idempotencyService
     ) {
-        this.corporateCardRepository = corporateCardRepository;
-        this.cardTransactionRepository = cardTransactionRepository;
-        this.walletRepository = walletRepository;
-        this.employeeRepository = employeeRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.ledgerService = ledgerService;
-        this.idempotencyService = idempotencyService;
+        this(corporateCardRepository, cardTransactionRepository, walletRepository, employeeRepository, passwordEncoder, ledgerService, idempotencyService, null);
     }
 
     @Override
@@ -138,7 +156,9 @@ public class CorporateCardServiceImpl implements CorporateCardService {
                 idempotencyKey,
                 "/api/cards/" + cardId + "/authorize",
                 CardAuthorizeResponseDto.class,
-                () -> executeAuthorization(cardId, dto, idempotencyKey)
+                () -> transactionTemplate != null
+                        ? transactionTemplate.execute(status -> executeAuthorization(cardId, dto, idempotencyKey))
+                        : executeAuthorization(cardId, dto, idempotencyKey)
         );
     }
 
